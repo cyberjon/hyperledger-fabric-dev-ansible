@@ -31,22 +31,20 @@
 
 - name: Install nvm
   shell: >
-    curl https://raw.githubusercontent.com/creationix/nvm/v{{ nvm_version }}/install.sh | sh
-    creates=~/.nvm/nvm.sh
+    curl https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | sh
+  ignore_errors: true
 
 - name: Install node and set version
   shell: >
-    /bin/bash -c "source ~/.nvm/nvm.sh && nvm install v{{ node_version }} && nvm alias default v{{ node_version }}"
-    creates=~/.nvm/alias
-    warn=False
+    /bin/bash -c "source ~/.nvm/nvm.sh && nvm install --lts"
+  ignore_errors: true
 
-- name: Install composer-cli globally
-  become_user: "{{ server_user }}"
+- name: Composer Uninstall
   shell: >
-      . ~/.bashrc && npm install -g composer-cli@{{ composer_version }}
-      creates=~/.nvm/versions/node/v{{ node_version }}/bin/composer
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/home/{{ server_user }}/.nvm/versions/node/v{{ node_version }}/bin"
+    /bin/bash -c "source ~/.nvm/nvm.sh && npm uninstall -g composer-cli"
+  ignore_errors: true
 
-- name: Create .composer folder
-  file: path=~/.composer state=directory
+- name: Composer Install
+  shell: >
+    /bin/bash -c "source ~/.nvm/nvm.sh && npm install --unsafe-perm -g composer-cli@0.19.4"
+  ignore_errors: true
